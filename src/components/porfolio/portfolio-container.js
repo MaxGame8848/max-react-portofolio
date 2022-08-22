@@ -10,14 +10,8 @@ export default class PortfolioContainer extends Component {
       this.state = {
         pageTitle: "Welcome to my portfolio",
         isLoading: false,
-        data: [
-          { title: "Quip", category: "eCommerce", slug: "Quip"},
-          { title: "Eventbrite", category: "Scheduling", slug: "Eventbrite" },
-          { title: "Ministry Safe", category: "Enterprise", slug: "Ministry-Safe" },
-          { title: "SwingAway", category: "eCommerce", slug: "SwingAway" }
-        ]
+        data: []
       };
-      this.getPortfolioItems = this.getPortfolioItems.bind(this);
       this.handleFilter = this.handleFilter.bind(this);
     }
   
@@ -27,30 +21,35 @@ export default class PortfolioContainer extends Component {
           return item.category === filter;
         })
       });
+    }  
+    getPortfolioItems(){
+      axios
+        .get('https://maxbenea.devcamp.space/portfolio/portfolio_items')
+        .then(response => {
+          // handle success
+          this.setState({
+            data: response.data.portfolio_items
+          })
+        })
+        .catch(error => {
+          // handle error
+          console.log(error);
+        });
     }
-  
     portfolioItems() {
       return this.state.data.map(item => {
-        return <PortfolioItem title={item.title} url={"google.com"} slug={item.slug} />;
+        return <PortfolioItem 
+        key={item.id} 
+        item={item}/>;
       });
     }
-    getPortfolioItems(){
-      axios.get('https://maxbenea.devcamp.space/portfolio/portfolio_items')
-      .then(response => {
-        // handle success
-        console.log(response);
-      })
-      .catch(error => {
-        // handle error
-        console.log(error);
-      });
+    componentDidMount() {
+      this.getPortfolioItems();
     }
-  
     render() {
         if (this.state.isLoading){
             return <div>Loading ...</div>
         }
-        this.getPortfolioItems();
       return (
         <div>
           <h2>{this.state.pageTitle}</h2>
